@@ -53,8 +53,18 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
+;; Set google drive location based on machine
+
+(cl-case (system-name)
+  ("pop-os" (setq gdrive "/home/sean/Insync/johnsen.s@husky.neu.edu/Google Drive")))
+
+(cond ((string= (system-name) "pop-os")
+       (setq gdrive_path "/home/sean/Insync/johnsen.s@husky.neu.edu/Google Drive"))
+      ((string= (system-name) "macos")
+       (setq gdrive_path "/home/sean/Insync/johnsen.s@husky.neu.edu/Google Drive")))
+
 ; org-roam settings
-(setq org-roam-directory "~/gdrive/slipbox")
+(setq org-roam-directory gdrive_path)
 
 ; org-ref settings
 (setq reftex-default-bibliography '("~/gdrive/zotero_library.bib"))
