@@ -56,7 +56,7 @@
 ;; Set google drive location based on machine
 
 (cl-case (system-name)
-  ("pop-os" (setq gdrive "/home/sean/Insync/johnsen.s@husky.neu.edu/Google Drive")))
+  ("pop-os" (setq gdrive_path "/home/sean/Insync/johnsen.s@husky.neu.edu/Google Drive")))
 
 (cond ((string= (system-name) "pop-os")
        (setq gdrive_path "/home/sean/Insync/johnsen.s@husky.neu.edu/Google Drive"))
@@ -67,14 +67,14 @@
 (setq org-roam-directory gdrive_path)
 
 ; org-ref settings
-(setq reftex-default-bibliography '("~/gdrive/zotero_library.bib"))
-(setq org-ref-default-bibliography '("~/gdrive/zotero_library.bib")
-      org-ref-pdf-directory '("~/gdrive/Zotero"))
+(setq reftex-default-bibliography '((format "%s/zotero_library.bib" gdrive_path)))
+(setq org-ref-default-bibliography '((format "%s/zotero_library.bib" gdrive_path))
+      org-ref-pdf-directory '((format "%s/Zotero" gdrive_path)))
 
 ; org-bibtex settings
 (use-package! org-roam-bibtex
   :after org-roam
   :hook (org-roam-mode . org-roam-bibtex-mode)
-  :load-path "~/gdrie/zotero_library.bib"
+  :load-path (format "%s/zotero_library.bib" gdrive_path)
   :config
   (require 'org-ref))
