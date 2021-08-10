@@ -6,7 +6,6 @@
 
 - link:
     ~/.doom.d: doom
-    ~/.local/share/applications/org-protocol.desktop: org-protocol.desktop
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]
