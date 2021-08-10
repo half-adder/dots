@@ -54,3 +54,17 @@
 (package! csv-mode)
 (package! org-roam-bibtex)
 (unpin! org-roam) ; required for org-roam-bibtex when using org via the `+roam` flag
+(package! helm-bibtex)
+(package! pdf-tools)
+(package! org-noter)
+(package! ox-twbs)
+;(package! org-roam-server)
+(package! org-ref)
+(package! ox-reveal)
+(package! websocket)
+(package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
+(package! org-transclusion
+  :recipe (:host github
+           :repo "nobiot/org-transclusion"
+           :branch "main"
+           :files ("*.el")))
