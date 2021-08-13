@@ -106,10 +106,18 @@
 (setq +format-on-save-enabled-modes
       '(not org-mode))
 
+;;(use-package! deft
+;;  :config
+;;  (setq deft-directory (format "%s/slipbox/" gdrive_path))
+;;  (setq deft-recursive t)
+;;  (setq deft-use-filter-string-for-filename t)
+;;  (setq deft-default-extension "org"))
 
 (use-package! projectile
   :config
-  (setq projectile-indexing-method 'native))
+  (setq projectile-indexing-method 'native)
+  (setq projectile-project-search-path '("~/code", (format "%s/slipbox/" gdrive_path)))
+  )
 
 (use-package! org-noter
   :after (:any org pdf-view)
