@@ -60,6 +60,14 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
+
+;; org-mode settings
+(use-package! org
+  :config
+  (require 'org-inlinetask))
+
+(setq org-agenda-files '((format "%s/slipbox" gdrive_path)))
+
 ;; org-roam settings
 (setq org-roam-directory (format "%s/slipbox/" gdrive_path))
 (use-package! org-roam
@@ -76,7 +84,13 @@
            :if-new
            (file+head "references/${citekey}.org" "#+title: ${title}\n")
            :unnarrowed t)))
-  (org-roam-bibtex-mode))
+  (org-roam-bibtex-mode)
+  (setq org-roam-dailies-directory "meeting/")
+  (setq org-roam-dailies-capture-templates
+        '(("d" "default" entry "* %?" :if-new
+           :target (file+head "%<%Y-%m-%d>.org"
+                              "#+title: %<Y-%m-%d>\n"))))
+  )
 
 ;; bibtex-completion settings
 (after! bibtex-completion
@@ -172,3 +186,7 @@
    :leader
    :prefix "n"
    :desc "Org Transclusion Mode" "t" #'org-transclusion-mode))
+
+(use-package! ox-hugo
+  :config
+  (setq org-hugo-base-dir "~/code/personal_site"))
