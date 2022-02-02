@@ -68,3 +68,5 @@
            :repo "nobiot/org-transclusion"
            :branch "main"
            :files ("*.el")))
+(package! exec-path-from-shell)
+(package! org-super-agenda)

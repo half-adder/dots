@@ -1,4 +1,4 @@
-;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
@@ -36,7 +36,7 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory (format "%s/slipbox/" gdrive_path))
+(setq org-directory (format "%s/org/" gdrive_path))
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -64,9 +64,21 @@
 ;; org-mode settings
 (use-package! org
   :config
-  (require 'org-inlinetask))
+  (require 'org-inlinetask)
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "WORKING(w)" "|" "DONE(d)")
+          (sequence "READ(r)" "INTEGRATE(i)" "|" "PROCESSED(p)")))
 
-(setq org-agenda-files '((format "%s/slipbox" gdrive_path)))
+  (setq org-agenda-files
+        (directory-files-recursively (format "%s/org/" gdrive_path) "\\.org$"))
+
+  (setq org-todo-keyword-faces
+        '(("TODO" :foreground "red" :weight bold)
+          ("WORKING" :foreground "yellow" :weight bold)
+          ("DONE" :foreground "green" :weight bold)))
+  )
+
+
 
 ;; org-roam settings
 (setq org-roam-directory (format "%s/slipbox/" gdrive_path))
@@ -104,17 +116,19 @@
   (setq org-ref-completion-library 'org-ref-ivy-cite
         org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
         org-ref-default-bibliography (list (format "%s/zotero_library.bib" gdrive_path))
-        org-ref-pdf-directory (format "%s/Zotero" gdrive_path)))
+        org-ref-pdf-directory (format "%s/Zotero" gdrive_path)
+        org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f")))
 
 (setq reftex-default-bibliography (format "%s/zotero_library.bib" gdrive_path))
 
 ;; org-roam-bibtex settings
 (use-package! org-roam-bibtex
   :after org-roam
+  ;;:init
+  ;;(add-to-list 'exec-path "/usr/bin/bibtex2html")
   :config
   (require 'org-ref))
-
-
+  ;;(require 'ox-bibtex))
 
 ;; Disable Auto-format on save for certain file types
 (setq +format-on-save-enabled-modes
@@ -130,7 +144,7 @@
 (use-package! projectile
   :config
   (setq projectile-indexing-method 'native)
-  (setq projectile-project-search-path '("~/code", (format "%s/slipbox/" gdrive_path)))
+  (setq projectile-project-search-path '("~/code", (format "%s/org/" gdrive_path)))
   )
 
 (use-package! org-noter
@@ -190,3 +204,21 @@
 (use-package! ox-hugo
   :config
   (setq org-hugo-base-dir "~/code/personal_site"))
+
+;; elfeed config
+(setq rmh-elfeed-org-files (list (format "%s/elfeed.org" gdrive_path)))
+
+;; writeroom-mode
+(setq doom-variable-pitch-font (font-spec :family "Vollkorn" :size 12))
+
+;; Sets $MANPATH, $PATH and exec-path from your shell, but only when executed in a GUI frame on OS X and Linux.
+(setq exec-path (append exec-path '("/usr/bin")))
+(setq shell-file-name "bash")
+
+;; Org Super-Agenda
+;;(use-package! org-super-agenda
+  ;;:after org-agenda
+  ;;:config
+  ;;(setq ((org-super-agenda-groups
+         ;;'((:auto-property "ProjectId"))))
+    ;;(org-agenda-list)))
