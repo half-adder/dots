@@ -76,7 +76,25 @@
 
   (setq org-agenda-files
         (directory-files-recursively (format "%s/org/" gdrive_path) "\\.org$"))
-  )
+
+  (setq org-publish-project-alist
+        `(("lab-notebook-notes"
+           :base-directory ,(format "%s/org/mckay_lab_notebook/" gdrive_path)
+           :recursive t
+           :auto-sitemap t
+           :sitemap-title "Sitemap"
+           :base-extension "org"
+           :publishing-function org-html-publish-to-html
+           :publishing-directory "~/Desktop/mckay_lab_notebook-export/")
+          ("lab-notebook-static"
+           :base-directory ,(format "%s/org/mckay_lab_notebook/" gdrive_path)
+           :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|JPEG\\|jpeg\\|JPG"
+           :publishing-directory "~/Desktop/mckay_lab_notebook-export/"
+           :recursive t
+           :publishing-function org-publish-attachment)
+          ("lab-notebook"
+           :components ("lab-notebook-notes" "lab-notebook-static"))))
+)
 
 ;; org-roam settings
 (use-package! org-roam
@@ -94,39 +112,27 @@
            :if-new
            (file+head "references/${citekey}.org" "#+title: ${title}\n")
            :unnarrowed t)))
-  (org-roam-bibtex-mode)
   (setq org-roam-dailies-directory "meeting/")
   (setq org-roam-dailies-capture-templates
-      '(("d" "default" entry "* %?"
-         :if-new (file+head "%<%Y-%m-%d>.org"
-                            "#+title: %<%Y-%m-%d>\n"))))
+        '(("d" "default" entry "* %?"
+           :if-new (file+head "%<%Y-%m-%d>.org"
+                              "#+title: %<%Y-%m-%d>\n"))))
   )
 
-;; bibtex-completion settings
-(after! bibtex-completion
-  (setq bibtex-completion-notes-path (format "%s/org/slipbox/" gdrive_path)
-        bibtex-completion-bibliography (format "%s/zotero_library.bib" gdrive_path)
-        bibtex-completion-pdf-field "file"))
-
-;; org-ref settings
-(use-package! org-ref
+;; biblio settings
+(use-package! citar
   :config
-  (setq org-ref-completion-library 'org-ref-ivy-cite
-        org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
-        org-ref-default-bibliography (list (format "%s/zotero_library.bib" gdrive_path))
-        org-ref-pdf-directory (format "%s/Zotero" gdrive_path)
-        org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f")))
-
-(setq reftex-default-bibliography (format "%s/zotero_library.bib" gdrive_path))
-
-;; org-roam-bibtex settings
-(use-package! org-roam-bibtex
-  :after org-roam
-  ;;:init
-  ;;(add-to-list 'exec-path "/usr/bin/bibtex2html")
-  :config
-  (require 'org-ref)
-  (require 'ox-bibtex))
+  (setq citar-bibliography (list (format "%s/zotero_library.bib" gdrive_path))
+        citar-library-paths (list (format "%s/Zotero/" gdrive_path))
+        citar-notes-paths (list (format "%s/org/slipbox/references/" gdrive_path))
+        citar-symbols `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
+                        (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
+                        (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " "))
+        citar-symbol-separator "  "
+        org-cite-csl-styles-dir (format "%s/biblio/styles" gdrive_path)
+        org-cite-csl-locales-dir (format "%s/biblio/locales" gdrive_path)
+        org-cite-global-bibliography (list (format "%s/zotero_library.bib" gdrive_path)))
+  )
 
 ;; Disable Auto-format on save for certain file types
 (setq +format-on-save-enabled-modes
@@ -142,22 +148,7 @@
 (use-package! projectile
   :config
   (setq projectile-indexing-method 'native)
-  (setq projectile-project-search-path '("~/code", (format "%s/org/" gdrive_path)))
-  )
-
-(use-package! org-noter
-  :after (:any org pdf-view)
-  :config
-  (setq
-   ;; The WM can handle splits
-   org-noter-notes-window-location 'other-frame
-   ;; Please stop opening frames
-   org-noter-always-create-frame nil
-   ;; I want to see the whole file
-   org-noter-hide-other nil
-   ;; Everything is relative to the main notes file
-   org-noter-notes-search-path (list (format "%s/slipbox/" gdrive_path))
-   )
+  (setq projectile-project-search-path (list "~/code" (format "%s/org/" gdrive_path)))
   )
 
 (use-package! org-download
@@ -168,10 +159,6 @@
                 org-download-method 'directory
                 org-download-heading-lvl 1
                 org-download-screenshot-file "/tmp/screenshot.png"))
-
-(use-package! ox-reveal
-  :config
-  (setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js"))
 
 (use-package! websocket
   :after org-roam)
@@ -208,10 +195,6 @@
 
 ;; writeroom-mode
 (setq doom-variable-pitch-font (font-spec :family "Vollkorn" :size 12))
-
-;; Sets $MANPATH, $PATH and exec-path from your shell, but only when executed in a GUI frame on OS X and Linux.
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
 
 ;; Org Super-Agenda
 (use-package! org-super-agenda
