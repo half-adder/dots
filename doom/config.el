@@ -69,21 +69,19 @@
         '((sequence "TODO(t)" "WORKING(w)" "|" "DONE(d)")
           (sequence "READ(r)" "INTEGRATE(i)" "|" "PROCESSED(p)")))
 
-  (setq org-agenda-files
-        (directory-files-recursively (format "%s/org/" gdrive_path) "\\.org$"))
-
   (setq org-todo-keyword-faces
         '(("TODO" :foreground "red" :weight bold)
           ("WORKING" :foreground "yellow" :weight bold)
           ("DONE" :foreground "green" :weight bold)))
+
+  (setq org-agenda-files
+        (directory-files-recursively (format "%s/org/" gdrive_path) "\\.org$"))
   )
 
-
-
 ;; org-roam settings
-(setq org-roam-directory (format "%s/slipbox/" gdrive_path))
 (use-package! org-roam
   :config
+  (setq org-roam-directory (format "%s/org/slipbox/" gdrive_path))
   (org-roam-setup)
   (setq org-roam-capture-templates
         '(;; plain
@@ -99,14 +97,14 @@
   (org-roam-bibtex-mode)
   (setq org-roam-dailies-directory "meeting/")
   (setq org-roam-dailies-capture-templates
-        '(("d" "default" entry "* %?" :if-new
-           :target (file+head "%<%Y-%m-%d>.org"
-                              "#+title: %<Y-%m-%d>\n"))))
+      '(("d" "default" entry "* %?"
+         :if-new (file+head "%<%Y-%m-%d>.org"
+                            "#+title: %<%Y-%m-%d>\n"))))
   )
 
 ;; bibtex-completion settings
 (after! bibtex-completion
-  (setq bibtex-completion-notes-path (format "%s/slipbox/" gdrive_path)
+  (setq bibtex-completion-notes-path (format "%s/org/slipbox/" gdrive_path)
         bibtex-completion-bibliography (format "%s/zotero_library.bib" gdrive_path)
         bibtex-completion-pdf-field "file"))
 
@@ -127,8 +125,8 @@
   ;;:init
   ;;(add-to-list 'exec-path "/usr/bin/bibtex2html")
   :config
-  (require 'org-ref))
-  ;;(require 'ox-bibtex))
+  (require 'org-ref)
+  (require 'ox-bibtex))
 
 ;; Disable Auto-format on save for certain file types
 (setq +format-on-save-enabled-modes
@@ -212,13 +210,15 @@
 (setq doom-variable-pitch-font (font-spec :family "Vollkorn" :size 12))
 
 ;; Sets $MANPATH, $PATH and exec-path from your shell, but only when executed in a GUI frame on OS X and Linux.
-(setq exec-path (append exec-path '("/usr/bin")))
-(setq shell-file-name "bash")
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
 
 ;; Org Super-Agenda
-;;(use-package! org-super-agenda
-  ;;:after org-agenda
-  ;;:config
-  ;;(setq ((org-super-agenda-groups
-         ;;'((:auto-property "ProjectId"))))
-    ;;(org-agenda-list)))
+(use-package! org-super-agenda
+  :after org-agenda
+  :init
+  (setq org-super-agenda-groups '((:log t)
+                                  (:auto-group t)
+                                  ))
+  :config
+  (org-super-agenda-mode))
