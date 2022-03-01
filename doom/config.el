@@ -93,8 +93,24 @@
            :recursive t
            :publishing-function org-publish-attachment)
           ("lab-notebook"
-           :components ("lab-notebook-notes" "lab-notebook-static"))))
-)
+           :components ("lab-notebook-notes" "lab-notebook-static"))
+
+          ("slipbox-notes"
+           :base-directory ,(format "%s/org/slipbox/" gdrive_path)
+           :recursive t
+           :auto-sitemap t
+           :sitemap-title "Sitemap"
+           :base-extension "org"
+           :publishing-function org-html-publish-to-html
+           :publishing-directory "~/Desktop/slipbox-export")
+          ("slipbox-static"
+           :base-directory ,(format "%s/org/slipbox/" gdrive_path)
+           :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|JPEG\\|jpeg\\|JPG"
+           :publishing-directory "~/Desktop/slipbox-export/"
+           :recursive t
+           :publishing-function org-publish-attachment)
+          ("slipbox"
+           :components ("slipbox-notes", "slipbox-static")))))
 
 ;; org-roam settings
 (use-package! org-roam

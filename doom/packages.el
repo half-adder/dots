@@ -63,4 +63,4 @@
            :repo "nobiot/org-transclusion"
            :branch "main"
            :files ("*.el")))
-(package! org-super-agenda)
+(package! org-ql)

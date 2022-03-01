@@ -6,6 +6,9 @@
 
 - link:
     ~/.doom.d: doom
+    ~/.bashrc: bashrc
+    ~/.bash_profile: bash_profile
+    ~/.tmux.conf: tmux.conf
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]
