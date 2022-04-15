@@ -1,4 +1,4 @@
-;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+;; $DOOMDIR/confg.el -*- lexical-binding: t; -*-
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
@@ -7,7 +7,9 @@
 (cond ((string= (system-name) "pop-os")
        (setq gdrive_path "/home/sean/Insync/johnsen.s@husky.neu.edu/gdrive"))
       ((string= (system-name) "macos")
-       (setq gdrive_path "/home/sean/Insync/johnsen.s@husky.neu.edu/gdrive")))
+       (setq gdrive_path "/home/sean/Insync/johnsen.s@husky.neu.edu/gdrive"))
+      ((string= (system-name) "DESKTOP-K1252K3")
+       (setq gdrive_path "/mnt/g/My Drive")))
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
@@ -74,9 +76,6 @@
           ("WORKING" :foreground "yellow" :weight bold)
           ("DONE" :foreground "green" :weight bold)))
 
-  (setq org-agenda-files
-        (directory-files-recursively (format "%s/org/" gdrive_path) "\\.org$"))
-
   (setq org-publish-project-alist
         `(("lab-notebook-notes"
            :base-directory ,(format "%s/org/mckay_lab_notebook/" gdrive_path)
@@ -110,7 +109,16 @@
            :recursive t
            :publishing-function org-publish-attachment)
           ("slipbox"
-           :components ("slipbox-notes", "slipbox-static")))))
+           :components ("slipbox-notes", "slipbox-static"))))
+
+  (setq org-agenda-files (list
+                          (format "%s/org/mckay_lab_notebook/tasks.org" gdrive_path)
+                          (format "%s/org/mckay_lab_notebook/projects/PcG_initiation_project/notebook.org" gdrive_path)))
+  (setq org-capture-templates
+        `(("t" "Todo" entry
+           (file+headline ,(format "%s/org/mckay_lab_notebook/tasks.org" gdrive_path) "Inbox")
+           "* TODO %?")))
+  )
 
 ;; org-roam settings
 (use-package! org-roam
@@ -207,10 +215,10 @@
   (setq org-hugo-base-dir "~/code/personal_site"))
 
 ;; elfeed config
-(setq rmh-elfeed-org-files (list (format "%s/elfeed.org" gdrive_path)))
+(setq rmh-elfeed-org-files (list (format "%s/org/elfeed.org" gdrive_path)))
 
 ;; writeroom-mode
-(setq doom-variable-pitch-font (font-spec :family "Vollkorn" :size 12))
+;;(setq doom-variable-pitch-font (font-spec :family "Vollkorn" :size 12))
 
 ;; Org Super-Agenda
 (use-package! org-super-agenda
@@ -219,5 +227,53 @@
   (setq org-super-agenda-groups '((:log t)
                                   (:auto-group t)
                                   ))
+  (setq org-agenda-custom-commands
+        '(("g" "Get Things Done (GTD)"
+           ((agenda ""
+                    ((org-agenda-skip-function
+                      '(org-agenda-skip-entry-if 'deadline))
+                     (org-deadline-warning-days 0)))
+            (todo "NEXT"
+                  ((org-agenda-skip-function
+                    '(org-agenda-skip-entry-if 'deadline))
+                   (org-agenda-prefix-format "  %i %-12:c [%e] ")
+                   (org-agenda-overriding-header "\nTasks\n")))
+            (agenda nil
+                    ((org-agenda-entry-types '(:deadline))
+                     (org-agenda-format-date "")
+                     (org-deadline-warning-days 7)
+                     (org-agenda-skip-function
+                      '(org-agenda-skip-entry-if 'notregexp "\\* NEXT"))
+                     (org-agenda-overriding-header "\nDeadlines")))
+            (tags-todo "inbox"
+                       ((org-agenda-prefix-format "  %?-12t% s")
+                        (org-agenda-overriding-header "\nInbox\n")))
+            (tags "CLOSED>=\"<today>\""
+                  ((org-agenda-overriding-header "\nCompleted today\n")))))))
   :config
   (org-super-agenda-mode))
+
+
+;; EXPERIMENTAL
+;; Determine the specific system type.
+;; Emacs variable system-type doesn't yet have a "wsl/linux" value,
+;; so I'm front-ending system-type with my variable: sysTypeSpecific.
+;; I'm no elisp hacker, so I'm diverging from the elisp naming convention
+;; to ensure that I'm not stepping on any pre-existing variable.
+(setq-default sysTypeSpecific  system-type) ;; get the system-type value
+
+(cond
+ ;; If type is "gnu/linux", override to "wsl/linux" if it's WSL.
+ ((eq sysTypeSpecific 'gnu/linux)
+  (when (string-match "WSL2"
+                      (shell-command-to-string "uname -a"))
+
+    (setq-default sysTypeSpecific "wsl/linux") ;; for later use.
+    (setq
+     cmdExeBin"/mnt/c/Windows/System32/cmd.exe"
+     cmdExeArgs '("/c" "start" "") )
+    (setq
+     browse-url-generic-program  cmdExeBin
+     browse-url-generic-args     cmdExeArgs
+     browse-url-browser-function 'browse-url-generic)
+    )))
