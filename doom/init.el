@@ -155,7 +155,7 @@
         +pretty
         +hugo
         +dragndrop
-        +pomodoro
+        +journal
         )
        ;;php               ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more

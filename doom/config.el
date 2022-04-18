@@ -253,6 +253,12 @@
   :config
   (org-super-agenda-mode))
 
+(use-package! org-journal
+  :after org
+  :config
+  (setq org-journal-file-type 'monthly))
+
+
 
 ;; EXPERIMENTAL
 ;; Determine the specific system type.
