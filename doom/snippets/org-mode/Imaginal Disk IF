@@ -1,0 +1,38 @@
+# key: <disk-if
+# name: Imaginal Disk IF
+# condition: t
+# --
+* Disk IF ${1:sample_id} ${2:conditions} - ${3:start_date}--${3:$(format "[%s]" (org-read-date nil nil "++7d" nil (org-time-string-to-time yas-text)))}
+** Purpose
+$0
+
+
+** Tasks
+*** TODO Heatshock 10m $1
+SCHEDULED: ${3:$(format "<%s>" (org-read-date nil nil "++2d" nil (org-time-string-to-time yas-text)))}
+*** TODO Course dissect $1 & stain with primaries
+SCHEDULED: ${3:$(format "<%s>" (org-read-date nil nil "++6d" nil (org-time-string-to-time yas-text)))}
+*** TODO Stain $1 with secondaries, fine dissect, and mount
+SCHEDULED: ${3:$(format "<%s>" (org-read-date nil nil "++7d" nil (org-time-string-to-time yas-text)))}
+*** TODO Image slide $1
+SCHEDULED: ${3:$(format "<%s>" (org-read-date nil nil "++7d" nil (org-time-string-to-time yas-text)))}
+** Reagents
+#+caption: Fixation Buffer (created [$4])
+| Reagent | Volume (mL) |
+|---------+-------------|
+| Total   |           5 |
+| 1x PBS  |        3.75 |
+| 16% PFA |        1.25 |
+
+#+caption: Primary Antibodies
+| Antibody | Species | Dilution | Volume AB | Volume PBT | Final Volume | Final Dilution | Date Prepared | Times Used Before |
+|----------+---------+----------+-----------+------------+--------------+----------------+---------------+-------------------|
+|          |         |          |           |            |              |                |               |                   |
+
+#+caption: Secondary Antibodies
+| Antibody | AB Lot | Species | Dilution | Volume AB | Volume PBT | Final Volume | Final Dilution | Date Prepared |
+|----------+--------+---------+----------+-----------+------------+--------------+----------------+---------------|
+|          |        |         |          |           |            |              |                |               |
+
+** Notes
+- $3

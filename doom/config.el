@@ -68,7 +68,7 @@
   :config
   (require 'org-inlinetask)
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "WORKING(w)" "|" "DONE(d)")
+        '((sequence "TODO(t)" "WORKING(w)"  "|" "DONE(d)" "CANCELLED(c)")
           (sequence "READ(r)" "INTEGRATE(i)" "|" "PROCESSED(p)")))
 
   (setq org-todo-keyword-faces
@@ -113,7 +113,7 @@
 
   (setq org-agenda-files (list
                           (format "%s/org/mckay_lab_notebook/tasks.org" gdrive_path)
-                          (format "%s/org/mckay_lab_notebook/projects/PcG_initiation_project/notebook.org" gdrive_path)))
+                          (format "%s/org/mckay_lab_notebook/projects/PcG_Initiation/notebook.org" gdrive_path)))
   (setq org-capture-templates
         `(("t" "Todo" entry
            (file+headline ,(format "%s/org/mckay_lab_notebook/tasks.org" gdrive_path) "Inbox")
@@ -224,9 +224,9 @@
 (use-package! org-super-agenda
   :after org-agenda
   :init
-  (setq org-super-agenda-groups '((:log t)
-                                  (:auto-group t)
-                                  ))
+  ;;(setq org-super-agenda-groups '((:log t)
+  ;;                                (:auto-group t)
+  ;;                                ))
   (setq org-agenda-custom-commands
         '(("g" "Get Things Done (GTD)"
            ((agenda ""
