@@ -64,3 +64,4 @@
            :branch "main"
            :files ("*.el")))
 (package! org-ql)
+(package! modus-themes)

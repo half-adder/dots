@@ -6,7 +6,7 @@
 ;; Set google drive location based on machine
 (cond ((string= (system-name) "pop-os")
        (setq gdrive_path "/home/sean/Insync/johnsen.s@husky.neu.edu/gdrive"))
-      ((string= (system-name) "macos")
+      ((string= (system-type) 'darwin)
        (setq gdrive_path "/home/sean/Insync/johnsen.s@husky.neu.edu/gdrive"))
       ((string= (system-name) "DESKTOP-K1252K3")
        (setq gdrive_path "/mnt/g/My Drive")))
@@ -34,7 +34,22 @@
 ;; `load-theme' function. This is the default:
 ;;
 ;;(setq doom-theme 'doom-one)
-(setq doom-theme 'doom-dracula)
+;;(setq doom-theme 'doom-dracula)
+(use-package! modus-themes
+  :init
+  (setq
+   modus-themes-diffs 'desaturated
+   modus-themes-headings '((1 . (background overline))
+                           (2 . (background overline))
+                           (3 . (background overline))
+                           (t . (monochrome)))
+   modus-themes-bold-constructs t
+   modus-themes-syntax '(faint)
+   modus-themes-prompts nil
+   modus-themes-completions '((matches . (semibold background intense))
+                              (selection . (accented intense))
+                              (popup . (accented))))
+  (load-theme 'modus-operandi t))
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -68,13 +83,15 @@
   :config
   (require 'org-inlinetask)
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "WORKING(w)"  "|" "DONE(d)" "CANCELLED(c)")
-          (sequence "READ(r)" "INTEGRATE(i)" "|" "PROCESSED(p)")))
+        '((sequence "TODO(t)" "WORKING(w)"  "|" "DONE(d!)" "CANCELLED(c@)")
+          (sequence "READ(r)" "IN PROGRESS(i)" "|" "PROCESSED(p)")))
 
   (setq org-todo-keyword-faces
         '(("TODO" :foreground "red" :weight bold)
           ("WORKING" :foreground "yellow" :weight bold)
-          ("DONE" :foreground "green" :weight bold)))
+          ("DONE" :foreground "green" :weight bold)
+          ("CANCELLED" :foreground "green" :weight bold)
+          ("IN PROGRESS" :foreground "yellow" :weight bold)))
 
   (setq org-publish-project-alist
         `(("lab-notebook-notes"
@@ -114,6 +131,7 @@
   (setq org-agenda-files (list
                           (format "%s/org/mckay_lab_notebook/tasks.org" gdrive_path)
                           (format "%s/org/mckay_lab_notebook/projects/PcG_Initiation/notebook.org" gdrive_path)))
+
   (setq org-capture-templates
         `(("t" "Todo" entry
            (file+headline ,(format "%s/org/mckay_lab_notebook/tasks.org" gdrive_path) "Inbox")
@@ -130,11 +148,6 @@
           ("d" "default" plain "%?"
            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
                               "#+title: ${title}\n")
-           :unnarrowed t)
-          ;; bibliography note template
-          ("r" "bibliography reference" plain "%?"
-           :if-new
-           (file+head "references/${citekey}.org" "#+title: ${title}\n")
            :unnarrowed t)))
   (setq org-roam-dailies-directory "meeting/")
   (setq org-roam-dailies-capture-templates
@@ -155,7 +168,14 @@
         citar-symbol-separator "  "
         org-cite-csl-styles-dir (format "%s/biblio/styles" gdrive_path)
         org-cite-csl-locales-dir (format "%s/biblio/locales" gdrive_path)
-        org-cite-global-bibliography (list (format "%s/zotero_library.bib" gdrive_path)))
+        org-cite-global-bibliography (list (format "%s/zotero_library.bib" gdrive_path))
+        citar-filenotify-callback 'refresh-cache
+        citar-filenotify-files (list (format "%s/zotero_library.bib" gdrive_path))
+        citar-templates `((main . "${author editor:30}     ${date year issued:4}     ${title:48}")
+                          (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords:*}")
+                          (preview . "${author editor} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
+                          (note . "${=key=} - ${title}"))
+        )
   )
 
 ;; Disable Auto-format on save for certain file types
@@ -228,28 +248,35 @@
   ;;                                (:auto-group t)
   ;;                                ))
   (setq org-agenda-custom-commands
-        '(("g" "Get Things Done (GTD)"
-           ((agenda ""
-                    ((org-agenda-skip-function
-                      '(org-agenda-skip-entry-if 'deadline))
-                     (org-deadline-warning-days 0)))
-            (todo "NEXT"
-                  ((org-agenda-skip-function
-                    '(org-agenda-skip-entry-if 'deadline))
-                   (org-agenda-prefix-format "  %i %-12:c [%e] ")
-                   (org-agenda-overriding-header "\nTasks\n")))
-            (agenda nil
-                    ((org-agenda-entry-types '(:deadline))
-                     (org-agenda-format-date "")
-                     (org-deadline-warning-days 7)
-                     (org-agenda-skip-function
-                      '(org-agenda-skip-entry-if 'notregexp "\\* NEXT"))
-                     (org-agenda-overriding-header "\nDeadlines")))
-            (tags-todo "inbox"
-                       ((org-agenda-prefix-format "  %?-12t% s")
-                        (org-agenda-overriding-header "\nInbox\n")))
-            (tags "CLOSED>=\"<today>\""
-                  ((org-agenda-overriding-header "\nCompleted today\n")))))))
+        '(("d" "Daily View"
+           ((agenda "" ((org-agenda-span 'day)
+                        ;;(org-agenda-prefix-format '((agenda . "[ ]") (todo . "[ ] ")))
+                        (org-agenda-remove-tags t)
+                        (org-agenda-start-day nil) ;; today
+                        (org-super-agenda-groups
+                         '((:name "Scheduled for Today"
+                            :date today
+                            :todo t
+                            :scheduled today
+                            :discard (:anything t))
+                           ))))
+            (todo "" ((org-super-agenda-groups
+                       '((:name "Other"
+                          :auto-outline-path t
+                          :and (:todo t :scheduled nil )
+                          :discard (:tag "project")
+                          )))))
+            (todo "" ((org-agenda-overriding-header "blah")
+                      (org-agenda-remove-tags t)
+                      (org-agenda-prefix-format '((agenda . "[ ] ") (todo . "[ ] ")))
+                      (org-super-agenda-groups
+                       '((:name "Unscheduled Lab Tasks"
+                          :and (:todo t :category "LAB_TASKS" :scheduled nil)
+                          :discard (:anything t)
+                          )))))
+            nil
+            ("/mnt/c/Users/Sean/Desktop/agenda.html")
+           ))))
   :config
   (org-super-agenda-mode))
 
