@@ -18,7 +18,8 @@
  '(org-agenda-files
    '("/mnt/g/My Drive/org/mckay_lab_notebook/projects/PcG_Initiation/notebook.org" "/mnt/g/My Drive/org/mckay_lab_notebook/tasks.org" "/mnt/g/My Drive/org/elfeed.org" "/mnt/g/My Drive/org/notes.org"))
  '(rustic-ansi-faces
-   ["#282a36" "#ff5555" "#50fa7b" "#f1fa8c" "#61bfff" "#ff79c6" "#8be9fd" "#f8f8f2"]))
+   ["#282a36" "#ff5555" "#50fa7b" "#f1fa8c" "#61bfff" "#ff79c6" "#8be9fd" "#f8f8f2"])
+ '(warning-suppress-types '(((org-roam)) ((org-roam)) (defvaralias))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

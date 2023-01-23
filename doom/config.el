@@ -6,10 +6,8 @@
 ;; Set google drive location based on machine
 (cond ((string= (system-name) "pop-os")
        (setq gdrive_path "/home/sean/Insync/johnsen.s@husky.neu.edu/gdrive"))
-      ((string= (system-type) 'darwin)
-       (setq gdrive_path "/home/sean/Insync/johnsen.s@husky.neu.edu/gdrive"))
       ((string= (system-name) "DESKTOP-K1252K3")
-       (setq gdrive_path "/mnt/g/My Drive")))
+       (setq gdrive_path "/home/seanjohn/gdrive")))
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
